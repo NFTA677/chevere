@@ -1,0 +1,19 @@
+{
+  "name": "tienda-api",
+  "version": "1.0.0",
+  "description": "API REST con Express + MongoDB Atlas (Mongoose)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "mongoose": "^8.24.7"
+  }
+}

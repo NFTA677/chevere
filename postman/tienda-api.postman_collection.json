@@ -1,0 +1,1209 @@
+{
+  "info": {
+    "name": "Tienda API (Express + MongoDB)",
+    "description": "Ejecutar en orden con el Collection Runner después de `npm run seed`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "usuarioId",
+      "value": ""
+    },
+    {
+      "key": "categoriaId",
+      "value": ""
+    },
+    {
+      "key": "productoId",
+      "value": ""
+    },
+    {
+      "key": "pedidoId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Usuarios",
+      "item": [
+        {
+          "name": "Crear usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"usuarioId\", pm.response.json().id);",
+                  "pm.test(\"Devuelve el usuario creado\", () => { const d = pm.response.json(); pm.expect(d.nombre === 'Carlos Ruiz').to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos Ruiz\",\n  \"email\": \"carlos{{$timestamp}}@correo.com\",\n  \"telefono\": \"3007778899\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => { const d = pm.response.json(); pm.expect(Array.isArray(d) && d.length > 0).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Id correcto\", () => { const d = pm.response.json(); pm.expect(d.id == pm.collectionVariables.get(\"usuarioId\")).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Teléfono actualizado\", () => { const d = pm.response.json(); pm.expect(d.telefono === '3110000000').to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefono\": \"3110000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: email inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Malo\",\n  \"email\": \"no-es-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: email duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Copia\",\n  \"email\": \"ana@correo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: usuario no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "99999"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Categorías",
+      "item": [
+        {
+          "name": "Crear categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"categoriaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Deportes {{$timestamp}}\",\n  \"descripcion\": \"Artículos deportivos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categorias"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar categorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Devuelve una lista\", () => { const d = pm.response.json(); pm.expect(Array.isArray(d)).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categorias"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categorias/{{categoriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categorias",
+                "{{categoriaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Balones y más\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/categorias/{{categoriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categorias",
+                "{{categoriaId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Productos",
+      "item": [
+        {
+          "name": "Crear producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"productoId\", pm.response.json().id);",
+                  "pm.test(\"Incluye la categoría\", () => { const d = pm.response.json(); pm.expect(d.categoria && d.categoria.id == pm.collectionVariables.get('categoriaId')).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Balón de fútbol\",\n  \"precio\": 85000,\n  \"stock\": 5,\n  \"categoria\": \"{{categoriaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar precio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Precio actualizado\", () => { const d = pm.response.json(); pm.expect(Number(d.precio) === 90000).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 90000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: categoría no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"precio\": 1,\n  \"categoria\": \"000000000000000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: precio negativo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"precio\": -5,\n  \"categoria\": \"{{categoriaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/productos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Pedidos",
+      "item": [
+        {
+          "name": "Crear pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"pedidoId\", pm.response.json().id);",
+                  "pm.test(\"Total = 2 × 90000\", () => { const d = pm.response.json(); pm.expect(Number(d.total) === 180000).to.be.true; });",
+                  "pm.test(\"Estado inicial pendiente\", () => { const d = pm.response.json(); pm.expect(d.estado === 'pendiente').to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{usuarioId}}\",\n  \"productos\": [\n    {\n      \"producto\": \"{{productoId}}\",\n      \"cantidad\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stock descontado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Stock bajó de 5 a 3\", () => { const d = pm.response.json(); pm.expect(d.stock === 3).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: stock insuficiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{usuarioId}}\",\n  \"productos\": [\n    {\n      \"producto\": \"{{productoId}}\",\n      \"cantidad\": 100\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: pedido sin productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{usuarioId}}\",\n  \"productos\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye usuario y detalles\", () => { const d = pm.response.json(); pm.expect(d.detalles.length === 1 && !!d.usuario).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado a pagado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"pagado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: estado inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"perdido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"cancelado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}",
+                "estado"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Stock devuelto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Stock volvió a 5\", () => { const d = pm.response.json(); pm.expect(d.stock === 5).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Error: borrar producto con pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 409\", () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Limpieza",
+      "item": [
+        {
+          "name": "Eliminar pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pedidos/{{pedidoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{pedidoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/productos/{{productoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "productos",
+                "{{productoId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar categoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/categorias/{{categoriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "categorias",
+                "{{categoriaId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Usuario ya no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código 404\", () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
